@@ -4,8 +4,19 @@
 #include <vector>
 #include <array>
 
+const int WIDTH = 1280;
+const int HEIGHT = 720;
+const int SCALE = 5;
 
-std::array<std::array<double, 720>, 1280> flowfield;
+const int RENDER_WIDTH = WIDTH / SCALE;
+const int RENDER_HEIGHT = HEIGHT / SCALE;
+
+std::array<std::array<double, RENDER_HEIGHT>, RENDER_WIDTH> flowfield;
+
+double noise_height = 0;
+double noise_detail = 6;
+double x_mult = 0.02;
+double y_mult = 0.02;
 
 int main()
 {
@@ -20,15 +31,15 @@ int main()
 	{
 		// Update
 		{
-
-			for (int x = 0; x < 1280; x++)
+			for (int x = 0; x < RENDER_WIDTH; x++)
 			{
-				for (int y = 0; y < 720; y++)
+				for (int y = 0; y < RENDER_HEIGHT; y++)
 				{
-					flowfield[x][y] = (Map(perlin.octave2D_01((x * 0.01), (y * 0.01), 4), 0, 1, 0, 255));
+					flowfield[x][y] = (Map(perlin.octave3D_01((x * x_mult), (y * y_mult), noise_height, noise_detail), 0, 1, 0, 255));
 				}
-			}
-			
+			}	
+
+			noise_height += 0.01;
 		}
 
 		// Draw
@@ -36,11 +47,11 @@ int main()
 		{
 			ClearBackground(BLACK);
 
-			for (int x = 0; x < 1280; x++)
+			for (int x = 0; x < RENDER_WIDTH; x++)
 			{
-				for (int y = 0; y < 720; y++)
+				for (int y = 0; y < RENDER_HEIGHT; y++)
 				{
-					DrawPixel(x, y, Color(flowfield[x][y], 255, 255, 255));
+					DrawRectangle(x * SCALE, y * SCALE, SCALE, SCALE, Color(flowfield[x][y], 0, 0, 255));
 				}
 			}
 		}
