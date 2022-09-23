@@ -1,5 +1,6 @@
 #include <iostream>
 #include "raylib.h"
+#include "PerlinNoise.h"
 
 int main()
 {
