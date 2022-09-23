@@ -128,12 +128,14 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Functions.cpp" />
     <ClCompile Include="Perlin Noise Flowfield.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Functions.h" />
     <ClInclude Include="PerlinNoise.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
