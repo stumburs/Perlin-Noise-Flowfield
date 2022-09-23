@@ -1,6 +1,7 @@
 #pragma once
 #include "raylib.h"
 #include "raymath.h"
+#include <vector>
 
 struct Particle
 {
@@ -12,7 +13,7 @@ struct Particle
 
     void ApplyForce(Vector2 force);
 
-    void Follow(Vector2 flowfield[], int SCALE);
+    void Follow(std::vector<std::vector<Vector2>> flowfield, int SCALE);
 
     void WrapAroundEdges(int WIDTH, int HEIGHT);
 
