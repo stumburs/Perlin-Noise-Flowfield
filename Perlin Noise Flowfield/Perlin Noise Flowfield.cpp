@@ -4,23 +4,22 @@
 #include "Functions.h"
 #include "Particle.h"
 #include <vector>
+#include <fstream>
+#include <iostream>
+#include <string>
 
-const int WIDTH = 1600;
-const int HEIGHT = 900;
-const int SCALE = 20;
-
-const int RENDER_WIDTH = WIDTH / SCALE + 1;
-const int RENDER_HEIGHT = HEIGHT / SCALE + 1;
+const int WIDTH = 1920;
+const int HEIGHT = 1080;
+int scale = 20;
 
 std::vector<std::vector<Vector2>> flowfield;
 
 float flowfield_strength = 0.01f;
-
-const size_t particle_count = 10000;
+size_t particle_count = 10000;
 float particle_speed = 1.0f;
 float particle_size = 1.0f;
-unsigned char particle_strength = 4;
-std::array<Particle, particle_count> particles;
+unsigned char particle_strength = 1;
+std::vector<Particle> particles;
 
 double noise_height = 0;
 int32_t noise_detail = 6;
@@ -30,25 +29,66 @@ double z_mult = 0.02;
 
 int main()
 {
+
+	// Read Preset
+	if (FileExists("preset.ff"))
+	{
+		std::ifstream preset_file("preset.ff");
+		std::string line;
+		double values[13]{};
+		int value = 0;
+
+		// Read file
+		if (preset_file.is_open())
+		{
+			while (std::getline(preset_file, line))
+			{
+				values[value++] = std::stod(line.substr(line.find(' ') + 1));
+			}
+			preset_file.close();
+		}
+
+		// Apply preset
+		// WIDTH = [0]
+		// HEIGHT = [1]
+		scale = (int)values[2];
+		flowfield_strength = (float)values[3];
+		particle_count = (size_t)values[4];
+		particle_speed = (float)values[5];
+		particle_size = (float)values[6];
+		particle_strength = (unsigned char)values[7];
+		noise_height = (double)values[8];
+		noise_detail = (int32_t)values[9];
+		x_mult = (double)values[10];
+		y_mult = (double)values[11];
+		z_mult = (double)values[12];
+
+	}
+
+	SetConfigFlags(FLAG_MSAA_4X_HINT | FLAG_FULLSCREEN_MODE);
     InitWindow(WIDTH, HEIGHT, "Flowfield");
-	SetConfigFlags(FLAG_MSAA_4X_HINT);
 	SetTargetFPS(60);
+
+	int render_width = WIDTH / scale + 1;
+	int render_height = HEIGHT / scale + 1;
 
 	// Perlin noise setup
 	const siv::PerlinNoise::seed_type seed = 69420u;
 	const siv::PerlinNoise perlin{ seed };
 
 	// Init particles
-	for (int i = 0; i < particles.size(); i++)
+	for (int i = 0; i < particle_count; i++)
 	{
-		particles[i].pos = { (float)GetRandomValue(0, WIDTH), (float)GetRandomValue(0, HEIGHT) };
+		Particle p;
+		p.pos = { (float)GetRandomValue(0, WIDTH), (float)GetRandomValue(0, HEIGHT) };
+		particles.push_back(p);
 	}
 
 	// Init flowfield
-	for (int x = 0; x < RENDER_WIDTH; x++)
+	for (int x = 0; x < render_width; x++)
 	{
 		flowfield.push_back(std::vector<Vector2>());
-		for (int y = 0; y < RENDER_HEIGHT; y++)
+		for (int y = 0; y < render_height; y++)
 		{
 			// Calculate each vector
 			float angle = Map(perlin.octave3D_01((x * x_mult), (y * y_mult), (noise_height * z_mult), noise_detail), 0, 1, 0, 359);
@@ -81,11 +121,42 @@ int main()
 			// Update particles
 			for (int i = 0; i < particles.size(); i++)
 			{
-				particles[i].Update(flowfield, particle_speed, WIDTH, HEIGHT, SCALE);
+				particles[i].Update(flowfield, particle_speed, WIDTH, HEIGHT, scale);
 			}
 
 			// Move through noise
 			noise_height += 0.06;
+
+			// Take screenshot
+			//if (IsKeyPressed(KEY_ENTER)) TakeScreenshot("image.png");
+			if (IsKeyPressed(KEY_ENTER))
+			{
+				Image screenshot= LoadImageFromScreen();
+				ExportImage(screenshot, "screen.png");
+			}
+
+			if (IsKeyDown(KEY_LEFT_CONTROL) && IsKeyPressed(KEY_S))
+			{
+				std::ofstream preset_file;
+				preset_file.open("preset.ff");
+				if (preset_file.is_open())
+				{
+					preset_file <<	"WIDTH 1920\n" <<
+									"HEIGHT 1080\n" <<
+									"SCALE 20\n" <<
+									"flowfield_strength 0.01f\n" <<
+									"particle_count 10000\n" <<
+									"particle_speed 1.0f\n" <<
+									"particle_size 1.0f\n" <<
+									"particle_strength 1\n" <<
+									"noise_height 0\n" <<
+									"noise_detail 6\n" <<
+									"x_mult 0.02\n" <<
+									"y_mult 0.02\n" <<
+									"z_mult 0.02\n";
+					preset_file.close();
+				}
+			}
 		}
 
 		// Draw
@@ -98,9 +169,9 @@ int main()
 				background_cleared = true;
 			}
 
-			//for (int x = 0; x < RENDER_WIDTH; x++)
+			//for (int x = 0; x < render_width; x++)
 			//{
-			//	for (int y = 0; y < RENDER_HEIGHT; y++)
+			//	for (int y = 0; y < render_height; y++)
 			//	{
 			//		//DrawRectangle(x * SCALE, y * SCALE, SCALE, SCALE, Color(flowfield[x][y], 0, 0, 255));
 			//		DrawLine(	x * SCALE,
@@ -120,8 +191,8 @@ int main()
 										255,
 										(unsigned char)Map(particles[i].pos.y, 0, HEIGHT, 0, 255),
 										particle_strength});*/
-				particles[i].DrawPixel(		{ (unsigned char)Map(particles[i].pos.x, 0, WIDTH, 0, 255),
-											255,
+				particles[i].DrawPixel(		{ 255,
+											(unsigned char)Map(particles[i].pos.x, 0, WIDTH, 0, 255),
 											(unsigned char)Map(particles[i].pos.y, 0, HEIGHT, 0, 255),
 											particle_strength });
 			}

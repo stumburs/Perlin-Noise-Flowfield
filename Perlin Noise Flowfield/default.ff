@@ -1,0 +1,13 @@
+WIDTH 1920
+HEIGHT 1080
+scale 20
+flowfield_strength 0.01f
+particle_count 10000
+particle_speed 1.0f
+particle_size 1.0f
+particle_strength 1
+noise_height 0
+noise_detail 6
+x_mult 0.02
+y_mult 0.02
+z_mult 0.02
