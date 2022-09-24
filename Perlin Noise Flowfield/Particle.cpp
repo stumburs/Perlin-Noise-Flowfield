@@ -3,7 +3,7 @@
 #include "raylib.h"
 #include "raymath.h"
 
-void Particle::Update(std::vector<std::vector<Vector2>> flowfield, float max_speed, int WIDTH, int HEIGHT, int SCALE)
+void Particle::Update(const std::vector<std::vector<Vector2>> &flowfield, float max_speed, int WIDTH, int HEIGHT, int SCALE)
 {
     vel = Vector2Add(vel, acc);
     vel = Vector2Normalize(vel);
@@ -13,7 +13,7 @@ void Particle::Update(std::vector<std::vector<Vector2>> flowfield, float max_spe
     Follow(flowfield, SCALE);
 }
 
-void Particle::Follow(std::vector<std::vector<Vector2>> flowfield, int SCALE)
+void Particle::Follow(const std::vector<std::vector<Vector2>> &flowfield, int SCALE)
 {
     float x = floorf(pos.x / SCALE);
     float y = floorf(pos.y / SCALE);
