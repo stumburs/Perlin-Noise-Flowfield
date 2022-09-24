@@ -4,7 +4,6 @@
 #include "Functions.h"
 #include "Particle.h"
 #include <vector>
-#include <iostream>
 
 const int WIDTH = 1600;
 const int HEIGHT = 900;
@@ -23,7 +22,6 @@ float particle_size = 1.0f;
 unsigned char particle_strength = 1;
 std::array<Particle, particle_count> particles;
 
-
 double noise_height = 0;
 int32_t noise_detail = 6;
 double x_mult = 0.02;
@@ -39,7 +37,6 @@ int main()
 	// Perlin noise setup
 	const siv::PerlinNoise::seed_type seed = 6969u;
 	const siv::PerlinNoise perlin{ seed };
-
 
 	// Init particles
 	for (int i = 0; i < particles.size(); i++)
@@ -62,7 +59,6 @@ int main()
 	}
 
 	bool background_cleared = false;
-
 
 	while (!WindowShouldClose())
 	{
@@ -119,7 +115,11 @@ int main()
 			// Draw Particles
 			for (int i = 0; i < particles.size(); i++)
 			{
-				particles[i].Draw(particle_size, {(unsigned char)Map(particles[i].pos.x, 0, WIDTH, 0, 255), 255, 255, 10});
+				particles[i].Draw(	particle_size,
+									{(unsigned char)Map(particles[i].pos.x, 0, WIDTH, 0, 255),
+									(unsigned char)Map(particles[i].pos.y, 0, HEIGHT, 0, 255),
+									255,
+									10});
 			}
 		}
 		EndDrawing();
