@@ -9,11 +9,11 @@ struct Particle
     Vector2 vel; // Velocity
     Vector2 acc; // Acceleration
 
-    void Update(float max_speed, int WIDTH, int HEIGHT);
-
-    void ApplyForce(Vector2 force);
+    void Update(std::vector<std::vector<Vector2>> flowfield, float max_speed, int WIDTH, int HEIGHT, int SCALE);
 
     void Follow(std::vector<std::vector<Vector2>> flowfield, int SCALE);
+    
+    void ApplyForce(Vector2 force);
 
     void WrapAroundEdges(int WIDTH, int HEIGHT);
 

@@ -3,18 +3,14 @@
 #include "raylib.h"
 #include "raymath.h"
 
-void Particle::Update(float max_speed, int WIDTH, int HEIGHT)
+void Particle::Update(std::vector<std::vector<Vector2>> flowfield, float max_speed, int WIDTH, int HEIGHT, int SCALE)
 {
     vel = Vector2Add(vel, acc);
     vel = Vector2Normalize(vel);
     pos = Vector2Add(pos, Vector2Scale(vel, max_speed));
     WrapAroundEdges(WIDTH, HEIGHT);
     acc = { 0 };
-}
-
-void Particle::ApplyForce(Vector2 force)
-{
-    acc = Vector2Add(acc, force);
+    Follow(flowfield, SCALE);
 }
 
 void Particle::Follow(std::vector<std::vector<Vector2>> flowfield, int SCALE)
@@ -25,12 +21,17 @@ void Particle::Follow(std::vector<std::vector<Vector2>> flowfield, int SCALE)
     ApplyForce(force);
 }
 
+void Particle::ApplyForce(Vector2 force)
+{
+    acc = Vector2Add(acc, force);
+}
+
 void Particle::WrapAroundEdges(int WIDTH, int HEIGHT)
 {
-    if (pos.x > WIDTH && acc.x > 0) pos.x = 0;
-    if (pos.x < 0 && acc.x < 0) pos.x = WIDTH;
-    if (pos.y > HEIGHT && acc.y > 0) pos.y = 0;
-    if (pos.y < 0 && acc.y < 0) pos.y = HEIGHT;
+    if (pos.x > WIDTH) pos.x = 0;
+    if (pos.x < 0) pos.x = WIDTH;
+    if (pos.y > HEIGHT) pos.y = 0;
+    if (pos.y < 0) pos.y = HEIGHT;
 }
 
 void Particle::Draw(float size, Color color)

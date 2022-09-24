@@ -4,6 +4,6 @@
 
 double Map(double n, double start1, double stop1, double start2, double stop2);
 
-Vector2 Vec2FromAngle(int angle);
+Vector2 Vec2FromAngle(float angle);
 
 Vector2 SetMagnitude(Vector2 v, float magnitude);

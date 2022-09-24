@@ -4,6 +4,7 @@
 #include "Functions.h"
 #include "Particle.h"
 #include <vector>
+#include <iostream>
 
 const int WIDTH = 1280;
 const int HEIGHT = 720;
@@ -14,7 +15,9 @@ const int RENDER_HEIGHT = HEIGHT / SCALE + 1;
 
 std::vector<std::vector<Vector2>> flowfield;
 
-const size_t particle_count = 1000;
+float flowfield_strength = 0.01f;
+
+const size_t particle_count = 5000;
 float particle_speed = 1.0f;
 std::array<Particle, particle_count> particles;
 
@@ -63,18 +66,27 @@ int main()
 	{
 		// Update
 		{
-			for (int x = 0; x < RENDER_WIDTH; x++)
+			// Flowfield
+			for (int x = 0; x < flowfield.size(); x++)
 			{
-				for (int y = 0; y < RENDER_HEIGHT; y++)
+				for (int y = 0; y < flowfield[x].size(); y++)
 				{
 					// Calculate each vector
 					double angle = Map(perlin.octave3D_01((x * x_mult), (y * y_mult), (noise_height * z_mult), noise_detail), 0, 1, 0, 359);
 					Vector2 vec = Vec2FromAngle(angle);
-					vec = SetMagnitude(vec, 1);
+					vec = SetMagnitude(vec, flowfield_strength);
 					flowfield[x][y] = vec;
 				}
+
 			}	
 
+			// Update particles
+			for (int i = 0; i < particles.size(); i++)
+			{
+				particles[i].Update(flowfield, particle_speed, WIDTH, HEIGHT, SCALE);
+			}
+
+			// Move through noise
 			noise_height += 0.02;
 		}
 
@@ -105,8 +117,6 @@ int main()
 			// Draw Particles
 			for (int i = 0; i < particles.size(); i++)
 			{
-				particles[i].Follow(flowfield, SCALE);
-				particles[i].Update(particle_speed, WIDTH, HEIGHT);
 				particles[i].Draw(1, {(unsigned char)Map(particles[i].pos.x, 0, WIDTH, 0, 255), 255, 255, 5});
 			}
 		}
