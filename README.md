@@ -2,7 +2,7 @@
 
 A simple perlin noise flowfield generator written in C++ using Raylib.
 
-![Preview](/images/image1.png)
+<img src="/images/image1.png" width="50%" height="50%"><img src="/images/image2.png" width="50%" height="50%">
 
 ## Description
 
