@@ -7,7 +7,7 @@
 
 const int WIDTH = 1600;
 const int HEIGHT = 900;
-const int SCALE = 10;
+const int SCALE = 20;
 
 const int RENDER_WIDTH = WIDTH / SCALE + 1;
 const int RENDER_HEIGHT = HEIGHT / SCALE + 1;
