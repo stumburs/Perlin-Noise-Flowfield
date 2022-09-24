@@ -16,10 +16,10 @@ std::vector<std::vector<Vector2>> flowfield;
 
 float flowfield_strength = 0.01f;
 
-const size_t particle_count = 1000;
+const size_t particle_count = 50000;
 float particle_speed = 1.0f;
 float particle_size = 1.0f;
-unsigned char particle_strength = 1;
+unsigned char particle_strength = 10;
 std::array<Particle, particle_count> particles;
 
 double noise_height = 0;
@@ -116,10 +116,10 @@ int main()
 			for (int i = 0; i < particles.size(); i++)
 			{
 				particles[i].Draw(	particle_size,
-									{(unsigned char)Map(particles[i].pos.x, 0, WIDTH, 0, 255),
+									{(unsigned char)Map(particles[i].pos.x, 0, WIDTH, 255, 0),
 									(unsigned char)Map(particles[i].pos.y, 0, HEIGHT, 0, 255),
-									255,
-									10});
+									0,
+									particle_strength});
 			}
 		}
 		EndDrawing();
