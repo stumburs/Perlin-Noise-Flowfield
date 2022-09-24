@@ -34,7 +34,12 @@ void Particle::WrapAroundEdges(int WIDTH, int HEIGHT)
     if (pos.y < 0) pos.y = (float)HEIGHT;
 }
 
-void Particle::Draw(float size, Color color)
+void Particle::DrawCircle(float size, Color color)
 {
-    DrawCircle(pos.x, pos.y, size, color);
+    RAYLIB_H::DrawCircle(pos.x, pos.y, size, color);
+}
+
+void Particle::DrawPixel(Color color)
+{
+    RAYLIB_H::DrawPixel(pos.x, pos.y, color);
 }

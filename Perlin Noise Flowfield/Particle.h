@@ -17,5 +17,7 @@ struct Particle
 
     void WrapAroundEdges(int WIDTH, int HEIGHT);
 
-    void Draw(float size, Color color);
+    void DrawCircle(float size, Color color);
+
+    void DrawPixel(Color color);
 };

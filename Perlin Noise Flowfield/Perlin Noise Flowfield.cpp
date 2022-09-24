@@ -16,10 +16,10 @@ std::vector<std::vector<Vector2>> flowfield;
 
 float flowfield_strength = 0.01f;
 
-const size_t particle_count = 50000;
+const size_t particle_count = 10000;
 float particle_speed = 1.0f;
 float particle_size = 1.0f;
-unsigned char particle_strength = 10;
+unsigned char particle_strength = 4;
 std::array<Particle, particle_count> particles;
 
 double noise_height = 0;
@@ -35,7 +35,7 @@ int main()
 	SetTargetFPS(60);
 
 	// Perlin noise setup
-	const siv::PerlinNoise::seed_type seed = 6969u;
+	const siv::PerlinNoise::seed_type seed = 69420u;
 	const siv::PerlinNoise perlin{ seed };
 
 	// Init particles
@@ -85,7 +85,7 @@ int main()
 			}
 
 			// Move through noise
-			noise_height += 0.02;
+			noise_height += 0.06;
 		}
 
 		// Draw
@@ -115,11 +115,15 @@ int main()
 			// Draw Particles
 			for (int i = 0; i < particles.size(); i++)
 			{
-				particles[i].Draw(	particle_size,
-									{(unsigned char)Map(particles[i].pos.x, 0, WIDTH, 255, 0),
-									(unsigned char)Map(particles[i].pos.y, 0, HEIGHT, 0, 255),
-									0,
-									particle_strength});
+				/*particles[i].DrawCircle(	particle_size,
+										{(unsigned char)Map(particles[i].pos.x, 0, WIDTH, 0, 255),
+										255,
+										(unsigned char)Map(particles[i].pos.y, 0, HEIGHT, 0, 255),
+										particle_strength});*/
+				particles[i].DrawPixel(		{ (unsigned char)Map(particles[i].pos.x, 0, WIDTH, 0, 255),
+											255,
+											(unsigned char)Map(particles[i].pos.y, 0, HEIGHT, 0, 255),
+											particle_strength });
 			}
 		}
 		EndDrawing();
