@@ -1,6 +1,6 @@
 # Perlin Noise Flowfield
 
-A simple perlin noise flowfield generator written in C++ using Raylib.
+A simple perlin noise flowfield generator written in C++ 20 using Raylib.
 
 <img src="/images/image1.png" width="50%" height="50%"><img src="/images/image2.png" width="50%" height="50%">
 <img src="/images/image3.png" width="50%" height="50%">
