@@ -132,6 +132,7 @@
     <ClCompile Include="Functions.cpp" />
     <ClCompile Include="Particle.cpp" />
     <ClCompile Include="Perlin Noise Flowfield.cpp" />
+    <ClCompile Include="Preset.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -140,6 +141,7 @@
     <ClInclude Include="Functions.h" />
     <ClInclude Include="Particle.h" />
     <ClInclude Include="PerlinNoise.h" />
+    <ClInclude Include="Preset.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

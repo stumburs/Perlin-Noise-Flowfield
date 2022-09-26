@@ -7,70 +7,57 @@
 #include <fstream>
 #include <iostream>
 #include <string>
+#include <map>
+#include <variant>
+#include "Preset.h"
 
-const int WIDTH = 1920;
-const int HEIGHT = 1080;
+const int window_width = 1920;
+const int window_height = 1080;
 int scale = 20;
 
 std::vector<std::vector<Vector2>> flowfield;
 
 float flowfield_strength = 0.01f;
-size_t particle_count = 10000;
+int particle_count = 10000;
 float particle_speed = 1.0f;
 float particle_size = 1.0f;
 unsigned char particle_strength = 1;
 std::vector<Particle> particles;
 
-double noise_height = 0;
-int32_t noise_detail = 6;
-double x_mult = 0.02;
-double y_mult = 0.02;
-double z_mult = 0.02;
+float noise_height = 0;
+int noise_detail = 6;
+float x_mult = 0.02;
+float y_mult = 0.02;
+float z_mult = 0.02;
+float z = 0;
+
+Preset p_test;
 
 int main()
 {
-
 	// Read Preset
 	if (FileExists("preset.ff"))
 	{
-		std::ifstream preset_file("preset.ff");
-		std::string line;
-		double values[13]{};
-		int value = 0;
+		p_test = ReadPreset("preset.ff");
+		auto test = p_test.values.find("particle_speed");
 
-		// Read file
-		if (preset_file.is_open())
+		if (test == p_test.values.end())
 		{
-			while (std::getline(preset_file, line))
-			{
-				values[value++] = std::stod(line.substr(line.find(' ') + 1));
-			}
-			preset_file.close();
+			std::cout << "not found";
 		}
+		else
+		{
+			std::cout << std::get<decltype(test->second)>(p_test.values.begin());
 
-		// Apply preset
-		// WIDTH = [0]
-		// HEIGHT = [1]
-		scale = (int)values[2];
-		flowfield_strength = (float)values[3];
-		particle_count = (size_t)values[4];
-		particle_speed = (float)values[5];
-		particle_size = (float)values[6];
-		particle_strength = (unsigned char)values[7];
-		noise_height = (double)values[8];
-		noise_detail = (int32_t)values[9];
-		x_mult = (double)values[10];
-		y_mult = (double)values[11];
-		z_mult = (double)values[12];
-
+		}
 	}
 
 	SetConfigFlags(FLAG_MSAA_4X_HINT | FLAG_FULLSCREEN_MODE);
-    InitWindow(WIDTH, HEIGHT, "Flowfield");
+    InitWindow(window_width, window_height, "Flowfield");
 	SetTargetFPS(60);
 
-	int render_width = WIDTH / scale + 1;
-	int render_height = HEIGHT / scale + 1;
+	int render_width = window_width / scale + 1;
+	int render_height = window_height / scale + 1;
 
 	// Perlin noise setup
 	const siv::PerlinNoise::seed_type seed = 69420u;
@@ -80,7 +67,7 @@ int main()
 	for (int i = 0; i < particle_count; i++)
 	{
 		Particle p;
-		p.pos = { (float)GetRandomValue(0, WIDTH), (float)GetRandomValue(0, HEIGHT) };
+		p.pos = { (float)GetRandomValue(0, window_width), (float)GetRandomValue(0, window_height) };
 		particles.push_back(p);
 	}
 
@@ -98,6 +85,9 @@ int main()
 		}
 	}
 
+	// Set noise height
+	z = noise_height;
+
 	bool background_cleared = false;
 
 	while (!WindowShouldClose())
@@ -110,7 +100,7 @@ int main()
 				for (int y = 0; y < flowfield[x].size(); y++)
 				{
 					// Calculate each vector
-					double angle = Map(perlin.octave3D_01((x * x_mult), (y * y_mult), (noise_height * z_mult), noise_detail), 0, 1, 0, 359);
+					double angle = Map(perlin.octave3D_01((x * x_mult), (y * y_mult), (z * z_mult), noise_detail), 0, 1, 0, 359);
 					Vector2 vec = Vec2FromAngle(angle);
 					vec = SetMagnitude(vec, flowfield_strength);
 					flowfield[x][y] = vec;
@@ -121,39 +111,39 @@ int main()
 			// Update particles
 			for (int i = 0; i < particles.size(); i++)
 			{
-				particles[i].Update(flowfield, particle_speed, WIDTH, HEIGHT, scale);
+				particles[i].Update(flowfield, particle_speed, window_width, window_height, scale);
 			}
 
 			// Move through noise
-			noise_height += 0.06;
+			z += 0.06;
 
 			// Take screenshot
-			//if (IsKeyPressed(KEY_ENTER)) TakeScreenshot("image.png");
 			if (IsKeyPressed(KEY_ENTER))
 			{
 				Image screenshot= LoadImageFromScreen();
 				ExportImage(screenshot, "screen.png");
 			}
 
+			// Save preset
 			if (IsKeyDown(KEY_LEFT_CONTROL) && IsKeyPressed(KEY_S))
 			{
 				std::ofstream preset_file;
 				preset_file.open("preset.ff");
 				if (preset_file.is_open())
 				{
-					preset_file <<	"WIDTH 1920\n" <<
-									"HEIGHT 1080\n" <<
-									"SCALE 20\n" <<
-									"flowfield_strength 0.01f\n" <<
-									"particle_count 10000\n" <<
-									"particle_speed 1.0f\n" <<
-									"particle_size 1.0f\n" <<
-									"particle_strength 1\n" <<
-									"noise_height 0\n" <<
-									"noise_detail 6\n" <<
-									"x_mult 0.02\n" <<
-									"y_mult 0.02\n" <<
-									"z_mult 0.02\n";
+					preset_file <<	"window_width " << window_width << "\n" <<
+									"window_height " << window_height << "\n" <<
+									"scale " << scale << "\n" <<
+									"flowfield_strength " << flowfield_strength << "\n" <<
+									"particle_count " << particle_count << "\n" <<
+									"particle_speed " << particle_speed << "\n" <<
+									"particle_size " << particle_size << "\n" <<
+									"particle_strength " << (int)particle_strength << "\n" <<
+									"noise_height " << noise_height << "\n" <<
+									"noise_detail " << noise_detail << "\n" <<
+									"x_mult " << x_mult << "\n" <<
+									"y_mult " << y_mult << "\n" <<
+									"z_mult " << z_mult;
 					preset_file.close();
 				}
 			}
@@ -186,14 +176,9 @@ int main()
 			// Draw Particles
 			for (int i = 0; i < particles.size(); i++)
 			{
-				/*particles[i].DrawCircle(	particle_size,
-										{(unsigned char)Map(particles[i].pos.x, 0, WIDTH, 0, 255),
-										255,
-										(unsigned char)Map(particles[i].pos.y, 0, HEIGHT, 0, 255),
-										particle_strength});*/
 				particles[i].DrawPixel(		{ 255,
-											(unsigned char)Map(particles[i].pos.x, 0, WIDTH, 0, 255),
-											(unsigned char)Map(particles[i].pos.y, 0, HEIGHT, 0, 255),
+											(unsigned char)Map(particles[i].pos.x, 0, window_width, 0, 255),
+											(unsigned char)Map(particles[i].pos.y, 0, window_height, 0, 255),
 											particle_strength });
 			}
 		}
