@@ -13,15 +13,20 @@ Preset ReadPreset(std::string file_name)
 		{
 			std::string setting_name = line.substr(0, line.find_first_of(' '));
 			std::string setting_value = line.substr(line.find_first_of(' ') + 1);
-			bool is_float = setting_value.find('.');
-			preset.values.insert({ setting_name, (is_float) ? std::stof(setting_value) : std::stoi(setting_value) });
+			preset.values.insert({ setting_name, std::stof(setting_value)});
 		}
 		preset_file.close();
 	}
 	return preset;
 }
 
+
 void LoadPreset(Preset &preset)
 {
 	
+}
+
+float GetValueAtKey(const Preset& preset, std::string key)
+{
+	return preset.values.find(key)->second;
 }

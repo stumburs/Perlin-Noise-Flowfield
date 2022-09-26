@@ -7,7 +7,7 @@
 #include <fstream>
 #include <iostream>
 #include <string>
-#include <map>
+#include <unordered_map>
 #include <variant>
 #include "Preset.h"
 
@@ -31,25 +31,14 @@ float y_mult = 0.02;
 float z_mult = 0.02;
 float z = 0;
 
-Preset p_test;
+Preset preset;
 
 int main()
 {
 	// Read Preset
 	if (FileExists("preset.ff"))
 	{
-		p_test = ReadPreset("preset.ff");
-		auto test = p_test.values.find("particle_speed");
-
-		if (test == p_test.values.end())
-		{
-			std::cout << "not found";
-		}
-		else
-		{
-			std::cout << std::get<decltype(test->second)>(p_test.values.begin());
-
-		}
+		preset = ReadPreset("preset.ff");
 	}
 
 	SetConfigFlags(FLAG_MSAA_4X_HINT | FLAG_FULLSCREEN_MODE);
